@@ -1,6 +1,6 @@
 # CDFormer
 
-This repo is the official implementation for CDFormer: A Transformer-Based Network Focusing Correlation and Difference for Pansharpening  
+This repo is the official implementation for CDFormer: A Transformer-Based Network Focusing Correlation and Difference for Pansharpening.
 
 
 
