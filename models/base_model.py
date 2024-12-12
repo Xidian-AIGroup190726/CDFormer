@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 
 from datasets.utils import save_image, data_augmentation, data_denormalize
-from .common.utils import torch2np, smart_time, set_batch_cuda, up_sample
+from .common.utils import torch2np, dwt2d, smart_time, set_batch_cuda, up_sample
 from .common.losses import get_loss_module
 from .common import metrics as mtc
 from torch.utils.tensorboard import SummaryWriter
@@ -116,14 +116,10 @@ class Base_model:
             module.load_state_dict(checkpoint[module_name].state_dict())
 
     def load_pretrained(self, path: str):
-
         checkpoint = torch.load(path)
         for module_name in self.module_dict:
             module = self.module_dict[module_name]
             module.load_state_dict(checkpoint[module_name].state_dict())
-
-        # 保存.pth
-        torch.save(module.state_dict(),'data/pretrain.pth')
 
     def set_optim(self):
         optim_cfg = self.cfg.get('optim_cfg', {})
@@ -185,6 +181,8 @@ class Base_model:
                 if 'aug_dict' in self.cfg:
                     input_batch = data_augmentation(input_batch, self.cfg.aug_dict)
                 iter_id += 1
+                # .train()用于在训练神经网络时启用dropout、batch
+                # normalization和其他特定于训练的操作的函数。这个方法会通知模型进行反向传播，并更新模型的权重和偏差。
                 for module in self.module_dict.values():
                     module.train()
                 self.before_train_iter()
@@ -209,27 +207,63 @@ class Base_model:
 
         self.after_train()
 
-    # def train_iter(self, iter_id, input_batch, log_freq=10):
-    #     r""" train for one iteration
-    #
-    #     Args:
-    #         iter_id (int): current iteration id
-    #         input_batch (dict[str, torch.Tensor | str]): a batch of data from Dataloader
-    #         log_freq (int): every n iterations to print the value of loss
-    #     """
-    #     core_optim = self.optim_dict['core_module']
-    #
-    #     target = input_batch['target']
-    #     output = self.get_model_output(input_batch=input_batch)
-    #
-    #     rec_loss = self.loss_module['rec_loss']
-    #     loss = rec_loss(output, target)
-    #
-    #     core_optim.zero_grad()
-    #     loss.backward()
-    #     core_optim.step()
-    #
-    #     self.print_train_log(iter_id, dict(full_loss=loss), log_freq)
+    def train_iter(self, iter_id, input_batch, log_freq=100):
+
+        # 初始化各模型
+        Core = self.module_dict['core_module']
+        Core_optim = self.optim_dict['core_module']
+
+        loss = 0.0
+        loss_res = dict()
+        loss_cfg = self.cfg.get('loss_cfg', {})
+
+        # 模型运行
+        # 初始化各类型的遥感图像
+        input_pan = input_batch['input_pan']
+        input_lr = input_batch['input_lr']
+
+        # 模型运行
+        output, l_dwt_ms, h_dwt_pan = Core(input_lr, input_pan)
+
+        # 计算损失函数
+        if 'QNR_loss' in self.loss_module and loss_cfg['QNR_loss'].w != 0.0 :
+            input_pan_l = input_batch['input_pan_l']
+            QNR_loss = self.loss_module['QNR_loss'](pan=input_pan, ms=input_lr, pan_l=input_pan_l, out=output)
+            loss += QNR_loss * loss_cfg['QNR_loss'].w
+            loss_res['QNR_loss'] = QNR_loss.item()
+
+        l_out, h_out = dwt2d(output)
+        target = input_batch['target']
+        l_gt, h_gt = dwt2d(target)
+
+        if 'spectral_rec_loss' in self.loss_module and loss_cfg['spectral_rec_loss'].w != 0.0:
+            spectral_rec_loss = self.loss_module['spectral_rec_loss'](
+                out=l_out, gt=l_gt)
+            loss += spectral_rec_loss * loss_cfg['spectral_rec_loss'].w
+            loss_res['spectral_rec_loss'] = spectral_rec_loss.item()
+
+        if 'spatial_rec_loss' in self.loss_module and loss_cfg['spatial_rec_loss'].w != 0.0:
+            spatial_rec_loss = self.loss_module['spatial_rec_loss'](
+                out=h_out, gt=h_gt)
+            loss += spatial_rec_loss * loss_cfg['spatial_rec_loss'].w
+            loss_res['spatial_rec_loss'] = spatial_rec_loss.item()
+
+        if 'rec_loss' in self.loss_module and loss_cfg['rec_loss'].w != 0.0:
+            rec_loss = self.loss_module['rec_loss'](
+                out=output, gt=target)
+            loss += rec_loss * loss_cfg['rec_loss'].w
+            loss_res['rec_loss'] = rec_loss.item()
+
+        loss_res['full_loss'] = loss.item()
+
+        # 更新参数
+        Core_optim.zero_grad()
+        loss.backward()
+        Core_optim.step()
+
+        self.print_train_log(iter_id, loss_res, log_freq)
+
+        return loss_res
 
     def print_train_log(self, iter_id, loss_res, log_freq=10):
         r""" print current loss at one iteration

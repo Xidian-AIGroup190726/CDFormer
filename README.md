@@ -1,12 +1,12 @@
-# CDFormer
+# FAFormer: Frequency-Analysis-Based Transformer Focusing on Correlation and Specificity for Pansharpening
 
-This repo is the official implementation for CDFormer: A Transformer-Based Network Focusing Correlation and Difference for Pansharpening.
+This repo is the official implementation for FAFormer: Frequency-Analysis-Based Transformer Focusing on Correlation and Specificity for Pansharpening.
 
 
 
-## Architecture of CDformer
+## Architecture of FAFormer
 
-![CDFormer](pic/CDFormer.jpg)
+![FAFormer](pic/FAFormer.jpg)
 
 
 
@@ -33,8 +33,8 @@ This repo is the official implementation for CDFormer: A Transformer-Based Netwo
 This environment is mainly based on python=3.6 with CUDA=10.2
 
 ```shell
-conda create -n cdformer python=3.6
-conda activate cdformer
+conda create -n faformer python=3.6
+conda activate faformer
 conda install pytorch=1.7.1 torchvision=0.2.2 cudatoolkit=10.2
 pip install mmcv==1.2.7
 conda install gdal=3.1.0 -c conda-forge
@@ -54,10 +54,10 @@ pip install sewar==0.4.4
 Due to the large size of the dataset, we only provide some samples in './data' to verify the code.
 
 ```shell
-conda activate cdformer
+conda activate faformer
 export CUDA_VISIBLE_DEVICES='0';
-python main.py -c configs/cdformer.py
+python main.py -c configs/faformer.py
 ```
 
-You can modify the config file 'configs/panformer.py' for different purposes.
+You can modify the config file 'configs/faformer.py' for different purposes.
 

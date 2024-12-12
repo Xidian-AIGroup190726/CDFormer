@@ -1,0 +1,104 @@
+2024-12-12 13:39:24,284 - mmFusion - INFO - Config:
+Dict = typing.Dict
+name = 'FAFormer'
+description = 'test on GF-1 FAFormer dataset'
+model_type = 'FAFormer'
+work_dir = 'data/GF-1/model_out/FAFormer'
+log_dir = 'logs/faformer'
+log_file = 'logs/faformer/FAFormer.log'
+log_level = 'INFO'
+only_test = True
+pretrained = 'data/pretrain.pth'
+ms_chans = 4
+bit_depth = 10
+aug_dict = dict(lr_flip=0.5, ud_flip=0.5)
+train_set_cfg = dict(
+    dataset=dict(
+        type='PSDataset',
+        image_dirs=['data/GF-1/dataset/test_low_res'],
+        bit_depth=10),
+    num_workers=2,
+    batch_size=1,
+    shuffle=True)
+test_set0_cfg = dict(
+    dataset=dict(
+        type='PSDataset',
+        image_dirs=['data/GF-1/dataset/test_full_res'],
+        bit_depth=10),
+    num_workers=2,
+    batch_size=1,
+    shuffle=False)
+test_set1_cfg = dict(
+    dataset=dict(
+        type='PSDataset',
+        image_dirs=['data/GF-1/dataset/test_low_res'],
+        bit_depth=10),
+    num_workers=2,
+    batch_size=1,
+    shuffle=False)
+cuda = True
+max_iter = 100000
+save_freq = 1000
+test_freq = 30000
+eval_freq = 500
+sched_cfg = dict(step_size=5000, gamma=0.95)
+loss_cfg = dict(
+    QNR_loss=dict(w=0.0),
+    spectral_rec_loss=dict(type='l1', w=0.0),
+    spatial_rec_loss=dict(type='l1', w=0.0),
+    rec_loss=dict(type='l1', w=1.0))
+optim_cfg = dict(core_module=dict(type='AdamW', lr=0.0002))
+model_cfg = dict(
+    n_feats=16,
+    core_module=dict(
+        norm_input=False,
+        bit_depth=10,
+        norm_type='IN',
+        n_blocks=(1, 1, 2),
+        inn_iters=(2, 1)),
+    to_pan_mode='avg')
+
+2024-12-12 13:39:24,284 - mmFusion - INFO - ===> Loading Datasets
+2024-12-12 13:39:24,285 - mmFusion - INFO - ===> Building Model
+2024-12-12 13:39:24,622 - mmFusion - INFO - ===> Setting GPU
+2024-12-12 13:39:27,055 - mmFusion - INFO - ===> Weight Initializing
+2024-12-12 13:39:27,055 - mmFusion - INFO - ===> Loading Pretrained
+2024-12-12 13:39:28,835 - mmFusion - INFO - ===> Setting Optimizer
+2024-12-12 13:39:28,844 - mmFusion - INFO - ===> Setting Scheduler
+2024-12-12 13:39:28,844 - mmFusion - INFO - ===> Params Count
+2024-12-12 13:39:28,850 - mmFusion - INFO - total params of "core_module": 2337468
+2024-12-12 13:39:28,850 - mmFusion - INFO - total params: 2337468
+2024-12-12 13:39:28,857 - mmFusion - INFO - total trainable params of "core_module": 2319036
+2024-12-12 13:39:28,857 - mmFusion - INFO - total trainable params: 2319036
+2024-12-12 13:39:28,857 - mmFusion - INFO - ===> Final Testing
+2024-12-12 13:39:28,857 - mmFusion - INFO - Low resolution testing ...
+2024-12-12 13:39:49,864 - mmFusion - INFO - SAM metric value: 1.1871 +- 0.0432
+2024-12-12 13:39:49,865 - mmFusion - INFO - ERGAS metric value: 1.0886 +- 0.0201
+2024-12-12 13:39:49,865 - mmFusion - INFO - Q4 metric value: 0.8865 +- 0.0246
+2024-12-12 13:39:49,865 - mmFusion - INFO - SCC metric value: 0.9430 +- 0.0111
+2024-12-12 13:39:49,865 - mmFusion - INFO - SSIM metric value: 0.9681 +- 0.0017
+2024-12-12 13:39:49,865 - mmFusion - INFO - MPSNR metric value: 41.5718 +- 0.1185
+2024-12-12 13:39:49,865 - mmFusion - INFO - SAM metric curve: [1.1871]
+2024-12-12 13:39:49,865 - mmFusion - INFO - ERGAS metric curve: [1.0886]
+2024-12-12 13:39:49,865 - mmFusion - INFO - Q4 metric curve: [0.8865]
+2024-12-12 13:39:49,865 - mmFusion - INFO - SCC metric curve: [0.943]
+2024-12-12 13:39:49,865 - mmFusion - INFO - SSIM metric curve: [0.9681]
+2024-12-12 13:39:49,865 - mmFusion - INFO - MPSNR metric curve: [41.5718]
+2024-12-12 13:39:49,865 - mmFusion - INFO - Avg time cost per img: 1.99356s
+2024-12-12 13:39:49,866 - mmFusion - INFO - Full resolution testing ...
+2024-12-12 13:40:03,700 - mmFusion - INFO - D_lambda metric value: 0.0518 +- 0.0154
+2024-12-12 13:40:03,700 - mmFusion - INFO - D_s metric value: 0.1444 +- 0.0247
+2024-12-12 13:40:03,701 - mmFusion - INFO - QNR metric value: 0.8115 +- 0.0328
+2024-12-12 13:40:03,701 - mmFusion - INFO - FCC metric value: 0.6491 +- 0.0171
+2024-12-12 13:40:03,701 - mmFusion - INFO - SF metric value: 6.5156 +- 0.2192
+2024-12-12 13:40:03,701 - mmFusion - INFO - SD metric value: 16.8054 +- 2.0960
+2024-12-12 13:40:03,701 - mmFusion - INFO - SAM_nrf metric value: 0.8446 +- 0.0612
+2024-12-12 13:40:03,701 - mmFusion - INFO - D_lambda metric curve: [0.0518]
+2024-12-12 13:40:03,701 - mmFusion - INFO - D_s metric curve: [0.1444]
+2024-12-12 13:40:03,701 - mmFusion - INFO - QNR metric curve: [0.8115]
+2024-12-12 13:40:03,701 - mmFusion - INFO - FCC metric curve: [0.6491]
+2024-12-12 13:40:03,701 - mmFusion - INFO - SF metric curve: [6.5156]
+2024-12-12 13:40:03,701 - mmFusion - INFO - SD metric curve: [16.8054]
+2024-12-12 13:40:03,701 - mmFusion - INFO - SAM_nrf metric curve: [0.8446]
+2024-12-12 13:40:03,701 - mmFusion - INFO - Avg time cost per img: 1.78788s
+2024-12-12 13:40:03,703 - mmFusion - INFO - ===> Finish !!!

@@ -19,15 +19,15 @@ sys.path.append('.')
 def parse_args():
     parser = argparse.ArgumentParser(description='integrate patches into one big image')
     parser.add_argument('-z', '--data_type', required=False, default=r'GF-1', help='data type')
-    parser.add_argument('-d', '--dir', required=False, default='', help='directory of input patches')
+    parser.add_argument('-d', '--dir', required=False, default='F:\\file\pan-sharpening\对比算法\数据\GF-1-all\GF-1', help='directory of input patches')
     parser.add_argument('-t', '--dst', required=False, default=r'result_png', help='directory of save path')
-    # parser.add_argument('-m', '--model', required=False, default='origin', help='name of the model')
-    parser.add_argument('-c', '--col', required=False, default=22, type=int, help='how many columns')
-    parser.add_argument('-r', '--row', required=False, default=13, type=int, help='how many rows')
+    parser.add_argument('-m', '--model', required=False, default='BiFormer', help='name of the model')
+    parser.add_argument('-c', '--col', required=False, default=21, type=int, help='how many columns')
+    parser.add_argument('-r', '--row', required=False, default=21, type=int, help='how many rows')
     parser.add_argument('--ms_chan', default=4, type=int, help='how many channels of MS')
     parser.add_argument('-p', '--patch_size', default=400, type=int, help='patch size')
     parser.add_argument('-a', '--attn_block', default=81, type=int, help='the number of patch for show')
-    parser.add_argument('-s', '--scale', default=5.5, type=float, help='the rate of image dowm-sample scale')
+    parser.add_argument('-s', '--scale', default=7, type=float, help='the rate of image dowm-sample scale')
 
     return parser.parse_args()
 
@@ -107,7 +107,8 @@ def Draw(args, model, src_path):
     draw.rectangle(attn2_points, outline='yellow', width=4)
 
     # 保存图像
-    dst_file = args.dst + '/' + args.data_type + '/' + args.data_type + '-' + model + '.png'
+    # dst_file = args.dst + '/' + args.data_type + '/' + args.data_type + '-' + model + '.png'
+    dst_file = args.dst + '/' + args.data_type + '-' + model + '.png'
     mmcv.mkdir_or_exist(args.dst)
     img.save(dst_file)
 

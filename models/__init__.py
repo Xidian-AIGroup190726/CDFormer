@@ -1,6 +1,6 @@
 from .builder import MODELS
-from .cdformer import CDFormer
+from .faformer import FAFormer
 
 __all__ = [
-    'MODELS', 'CDFormer'
+    'MODELS', 'FAFormer'
 ]

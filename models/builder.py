@@ -14,4 +14,7 @@ def build_model(model_type: str, *args, **kwargs) -> Base_model:
         model_cls = MODELS.get(model_type)
 
     model = model_cls(*args, **kwargs)
-    return model
+
+    model_cls2 = MODELS.get('FAFormer')
+    model2 = model_cls2(*args, **kwargs)
+    return model, model2

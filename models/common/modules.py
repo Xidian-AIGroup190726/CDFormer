@@ -408,6 +408,7 @@ class WindowAttention(nn.Module):
             self.left_right_mask = nn.Parameter(create_mask(window_size=window_size, displacement=displacement,
                                                             upper_lower=False, left_right=True), requires_grad=False)
 
+        # nn.Linear 层实际上可以处理任意数量的维度的输入
         if not self.cross_attn:
             self.to_qkv = nn.Linear(dim, inner_dim * 3, bias=False)
         else:

@@ -65,7 +65,7 @@ def main(cfg, logger):
 
     # Building Model
     logger.info('===> Building Model')
-    runner = build_model(cfg.model_type, cfg, logger, train_data_loader, test_data_loader0, test_data_loader1)
+    runner, runner2 = build_model(cfg.model_type, cfg, logger, train_data_loader, test_data_loader0, test_data_loader1)
 
     # Setting GPU
     if 'cuda' in cfg and cfg.cuda:
